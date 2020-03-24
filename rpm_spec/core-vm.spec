@@ -670,7 +670,7 @@ if [ "$1" = 0 ] ; then
 fi
 
 %package systemd
-Summary:        Qubes unit files for SystemD init style
+Summary:        Qubes unit files for systemd init style
 License:        GPL v2 only
 Group:          Qubes
 Requires:       systemd
@@ -682,7 +682,7 @@ Provides:       qubes-core-vm-init-scripts
 Conflicts:      qubes-core-vm-sysvinit
 
 %description systemd
-The Qubes core startup configuration for SystemD init.
+The Qubes core startup configuration for systemd init.
 
 %files systemd
 %defattr(-,root,root,-)
