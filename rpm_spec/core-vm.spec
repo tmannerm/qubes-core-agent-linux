@@ -26,6 +26,11 @@
 %{!?version: %define version %(cat version)}
 %{!?backend_vmm: %define backend_vmm %(echo $BACKEND_VMM)}
 
+# SUSE doesn't have python3_pkgversion macro
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+%global python3_pkgversion 3
+%endif
+
 %define scriptletfuns is_static() { \
 	[ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -54,8 +59,7 @@ unmask() { \
 \
 preset_units() { \
 	local represet= \
-	cat "$1" | while read action unit_name \
-	do \
+	cat "$1" | while read action unit_name; do \
 		if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ]; then \
 			represet=1 \
 			continue \
@@ -82,8 +86,7 @@ preset_units() { \
 } \
 \
 restore_units() { \
-	grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name \
-	do \
+	grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name; do \
 		if is_static "$unit_name" && is_masked "$unit_name"; then \
 			# If the unit had been masked by us, we must unmask it here. \
 			# Otherwise systemctl preset will fail badly. \
@@ -113,19 +116,32 @@ Requires:   net-tools
 Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 3.2.7
-Requires:   initscripts
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+Requires:	insserv-compat
+%else
+Requires:	initscripts
+%endif
 Requires:   gawk
 Requires:   sed
 # for dispvm-prerun.sh
 Requires:   procps-ng
 Requires:   util-linux
 # for qubes-desktop-run
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+Requires:	python3-gobject
+Requires:	python3-dbus-python
+%else
 Requires:   pygobject3-base
 Requires:   dbus-python
+%endif
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
 Requires:   ImageMagick
-Requires:   librsvg2-tools
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+Requires:	rsvg-view
+%else
+Requires:	librsvg2-tools
+%endif
 Requires:   fakeroot
 Requires:   desktop-notification-daemon
 # to show/hide nm-applet
@@ -154,7 +170,7 @@ BuildRequires: python-setuptools
 %endif
 
 %package -n python2-dnf-plugins-qubes-hooks
-Summary:		DNF plugin for Qubes specific post-installation actions
+Summary:	DNF plugin for Qubes specific post-installation actions
 BuildRequires:	python2-devel
 %{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
 
@@ -164,7 +180,7 @@ DNF plugin for Qubes specific post-installation actions:
  * refresh applications shortcut list
 
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
-Summary:		DNF plugin for Qubes specific post-installation actions
+Summary:	DNF plugin for Qubes specific post-installation actions
 BuildRequires:	python%{python3_pkgversion}-devel
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
@@ -668,9 +684,15 @@ Summary:        Qubes unit files for systemd init style
 License:        GPL v2 only
 Group:          Qubes
 Requires:       systemd
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+Requires(post):	systemd
+Requires(preun):	systemd
+Requires(postun):	systemd
+%else
+Requires(post):	systemd-units
+Requires(preun):	systemd-units
+Requires(postun):	systemd-units
+%endif
 Requires:       qubes-core-vm
 Provides:       qubes-core-vm-init-scripts
 Conflicts:      qubes-core-vm-sysvinit
@@ -742,9 +764,8 @@ fi
 if [ $1 -eq 1 ]; then
 	# First install.
 	# Set default "runlevel".
-	# FIXME: this ought to be done via kernel command line.
-	# The fewer deviations of the template from the seed
-	# image, the better.
+	# FIXME: this ought to be done via kernel command-line.
+	# The fewer deviations of the template from the seed image, the better.
 	rm -f %{_sysconfdir}/systemd/system/default.target
 	ln -s %{_unitdir}/multi-user.target %{_sysconfdir}/systemd/system/default.target
 	changed=true
@@ -768,8 +789,8 @@ fi
 %preun systemd
 if [ $1 -eq 0 ]; then
 	# Run this only during uninstall.
-	# Save the preset file to later use it to re-preset services there
-	# once the Qubes OS preset file is removed.
+	# Save the preset file to later use it to re-preset services there once
+	# the Qubes OS preset file is removed.
 	mkdir -p %{_rundir}/qubes-uninstall
 	cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
 fi
