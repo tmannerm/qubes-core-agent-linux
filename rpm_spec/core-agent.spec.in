@@ -29,157 +29,157 @@
 %endif
 
 %define scriptletfuns is_static() { \
-	[ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
+    [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
 \
 is_masked() { \
-	if [ ! -L %{_sysconfdir}/systemd/system/"$1" ]; then \
-		return 1 \
-	fi \
-	target=`readlink %{_sysconfdir}/systemd/system/"$1" 2>/dev/null` || : \
-	if [ "$target" = "/dev/null" ]; then \
-		return 0 \
-	fi \
-	return 1 \
+    if [ ! -L %{_sysconfdir}/systemd/system/"$1" ]; then \
+        return 1 \
+    fi \
+    target=`readlink %{_sysconfdir}/systemd/system/"$1" 2>/dev/null` || : \
+    if [ "$target" = "/dev/null" ]; then \
+        return 0 \
+    fi \
+    return 1 \
 } \
 \
 mask() { \
-	ln -sf /dev/null %{_sysconfdir}/systemd/system/"$1" \
+    ln -sf /dev/null %{_sysconfdir}/systemd/system/"$1" \
 } \
 \
 unmask() { \
-	if ! is_masked "$1"; then \
-		return 0 \
-	fi \
-	rm -f %{_sysconfdir}/systemd/system/"$1" \
+    if ! is_masked "$1"; then \
+        return 0 \
+    fi \
+    rm -f %{_sysconfdir}/systemd/system/"$1" \
 } \
 \
 preset_units() { \
-	local represet= \
-	cat "$1" | while read action unit_name; do \
-		if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ]; then \
-			represet=1 \
-			continue \
-		fi \
-		echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue \
-		[ -n "$action" -a -n "$unit_name" ] || continue \
-		if [ "$2" = "initial" -o "$represet" = "1" ]; then \
-			if [ "$action" = "disable" ] && is_static "$unit_name"; then \
-				if ! is_masked "$unit_name"; then \
-					# We must effectively mask these units, even if they are static. \
-					mask "$unit_name" \
-				fi \
-			elif [ "$action" = "enable" ] && is_static "$unit_name"; then \
-				if is_masked "$unit_name"; then \
-					# We masked this static unit before, now we unmask it. \
-					unmask "$unit_name" \
-				fi \
-				systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
-			else \
-				systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
-			fi \
-		fi \
-	done \
+    local represet= \
+    cat "$1" | while read action unit_name; do \
+        if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ]; then \
+            represet=1 \
+            continue \
+        fi \
+        echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue \
+        [ -n "$action" -a -n "$unit_name" ] || continue \
+        if [ "$2" = "initial" -o "$represet" = "1" ]; then \
+            if [ "$action" = "disable" ] && is_static "$unit_name"; then \
+                if ! is_masked "$unit_name"; then \
+                    # We must effectively mask these units, even if they are static. \
+                    mask "$unit_name" \
+                fi \
+            elif [ "$action" = "enable" ] && is_static "$unit_name"; then \
+                if is_masked "$unit_name"; then \
+                    # We masked this static unit before, now we unmask it. \
+                    unmask "$unit_name" \
+                fi \
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+            else \
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+            fi \
+        fi \
+    done \
 } \
 \
 restore_units() { \
-	grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name; do \
-		if is_static "$unit_name" && is_masked "$unit_name"; then \
-			# If the unit had been masked by us, we must unmask it here. \
-			# Otherwise systemctl preset will fail badly. \
-			unmask "$unit_name" \
-		fi \
-		systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
-	done \
+    grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name; do \
+        if is_static "$unit_name" && is_masked "$unit_name"; then \
+            # If the unit had been masked by us, we must unmask it here. \
+            # Otherwise systemctl preset will fail badly. \
+            unmask "$unit_name" \
+        fi \
+        systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+    done \
 } \
 
-Name:		qubes-core-agent
-Version:	@VERSION@
-Release:	1%{dist}
-Summary:	The Qubes core files for VM
+Name:           qubes-core-agent
+Version:        @VERSION@
+Release:        1%{dist}
+Summary:        The Qubes core files for VM
 
-Group:		Qubes
-Vendor:		Invisible Things Lab
-License:	GPL
-URL:		http://www.qubes-os.org
+Group:          Qubes
+Vendor:         Invisible Things Lab
+License:        GPL
+URL:            http://www.qubes-os.org
 
-Conflicts:	firewalld
-Requires:	xdg-utils
-Requires:	qubes-utils >= 3.1.3
-Requires:	qubes-utils-libs >= 4.0.16
+Conflicts:      firewalld
+Requires:       xdg-utils
+Requires:       qubes-utils >= 3.1.3
+Requires:       qubes-utils-libs >= 4.0.16
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:	insserv-compat
+Requires:       insserv-compat
 %else
-Requires:	initscripts
+Requires:       initscripts
 %endif
-Requires:	gawk
-Requires:	sed
-Requires:	util-linux
-Requires:	e2fsprogs
-Requires:	hostname
+Requires:       gawk
+Requires:       sed
+Requires:       util-linux
+Requires:       e2fsprogs
+Requires:       hostname
 
 # for Qubes Manager VM updater
-Requires:	xterm
+Requires:       xterm
 
 # for qubes-desktop-run
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:	python3-gobject
-Requires:	python3-dbus-python
+Requires:       python3-gobject
+Requires:       python3-dbus-python
 %else
-Requires:	python%{python3_pkgversion}-gobject-base
-Requires:	python%{python3_pkgversion}-dbus
+Requires:       python%{python3_pkgversion}-gobject-base
+Requires:       python%{python3_pkgversion}-dbus
 %endif
 
 # for qubes-session-autostart, xdg-icon
-Requires:	python%{python3_pkgversion}-pyxdg
+Requires:       python%{python3_pkgversion}-pyxdg
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:	python3-python-daemon
+Requires:       python3-python-daemon
 %else
-Requires:	python%{python3_pkgversion}-daemon
+Requires:       python%{python3_pkgversion}-daemon
 %endif
 
 # for qvm-feature-request
-Requires:	python%{python3_pkgversion}-qubesdb
-Requires:	ImageMagick
+Requires:       python%{python3_pkgversion}-qubesdb
+Requires:       ImageMagick
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:	rsvg-view
+Requires:       rsvg-view
 %else
-Requires:	librsvg2-tools
+Requires:       librsvg2-tools
 %endif
-Requires:	zenity
-Requires:	dconf
-Requires:	qubes-core-qrexec-vm
-Requires:	qubes-libvchan
-Requires:	qubes-db-vm
-Requires:	python%{python3_pkgversion}-dnf-plugins-qubes-hooks
-Requires:	python%{python3_pkgversion}-setuptools
+Requires:       zenity
+Requires:       dconf
+Requires:       qubes-core-qrexec-vm
+Requires:       qubes-libvchan
+Requires:       qubes-db-vm
+Requires:       python%{python3_pkgversion}-dnf-plugins-qubes-hooks
+Requires:       python%{python3_pkgversion}-setuptools
 
 # for qubes.ResizeDisk
-Requires:	parted
-Obsoletes:	qubes-core-vm-kernel-placeholder <= 1.0
-Obsoletes:	qubes-upgrade-vm < 3.2
-Provides:	qubes-core-vm = %{version}-%{release}
-Obsoletes:	qubes-core-vm < 4.0.0
-Provides:	qubes-core-vm-doc = %{version}-%{release}
-Obsoletes:	qubes-core-vm-doc < 4.0.0
-BuildRequires:	gcc
-BuildRequires:	pandoc
-BuildRequires:	xen-devel
-BuildRequires:	libX11-devel
-BuildRequires:	qubes-utils-devel >= 3.1.3
-BuildRequires:	qubes-libvchan-@BACKEND_VMM@-devel
-BuildRequires:	pam-devel
-BuildRequires:	python%{python3_pkgversion}-setuptools
-BuildRequires:	systemd
+Requires:       parted
+Obsoletes:      qubes-core-vm-kernel-placeholder <= 1.0
+Obsoletes:      qubes-upgrade-vm < 3.2
+Provides:       qubes-core-vm = %{version}-%{release}
+Obsoletes:      qubes-core-vm < 4.0.0
+Provides:       qubes-core-vm-doc = %{version}-%{release}
+Obsoletes:      qubes-core-vm-doc < 4.0.0
+BuildRequires:  gcc
+BuildRequires:  pandoc
+BuildRequires:  xen-devel
+BuildRequires:  libX11-devel
+BuildRequires:  qubes-utils-devel >= 3.1.3
+BuildRequires:  qubes-libvchan-@BACKEND_VMM@-devel
+BuildRequires:  pam-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  systemd
 
-Source0: %{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 %description
 The Qubes core files for installation inside a Qubes VM.
 
 %package -n python2-dnf-plugins-qubes-hooks
-Summary:	DNF plugin for Qubes specific post-installation actions
-BuildRequires:	python2-devel
+Summary:        DNF plugin for Qubes specific post-installation actions
+BuildRequires:  python2-devel
 %{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
 
 %description -n python2-dnf-plugins-qubes-hooks
@@ -188,8 +188,8 @@ DNF plugin for Qubes specific post-installation actions:
  * refresh applications shortcut list
 
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
-Summary:	DNF plugin for Qubes specific post-installation actions
-BuildRequires:	python%{python3_pkgversion}-devel
+Summary:        DNF plugin for Qubes specific post-installation actions
+BuildRequires:  python%{python3_pkgversion}-devel
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
 %description -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
@@ -206,39 +206,39 @@ Agent part of Qubes RPC system. A daemon responsible for starting processes as
 requested by dom0 or other VMs, according to dom0-enforced policy.
 
 %package nautilus
-Summary:	Qubes integration for Nautilus
-Requires:	qubes-core-agent = %{version}
+Summary:        Qubes integration for Nautilus
+Requires:       qubes-core-agent = %{version}
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:	python3-nautilus
+Requires:       python3-nautilus
 %else
-Requires:	nautilus-python
+Requires:       nautilus-python
 %endif
-Conflicts:	qubes-core-vm < 4.0.0
+Conflicts:      qubes-core-vm < 4.0.0
 
 %description nautilus
 Nautilus addons for inter-VM file copy/move/open.
 
 %package dom0-updates
-Summary:	Scripts required to handle dom0 updates
-Requires:	qubes-core-agent = %{version}
-Requires:	fakeroot
-Conflicts:	qubes-core-vm < 4.0.0
-Requires:	tar
+Summary:        Scripts required to handle dom0 updates
+Requires:       qubes-core-agent = %{version}
+Requires:       fakeroot
+Conflicts:      qubes-core-vm < 4.0.0
+Requires:       tar
 
 %description dom0-updates
 Scripts required to handle dom0 updates.
 
 %package networking
-Summary:	Networking support for Qubes VM
-Requires:	ethtool
-Requires:	iptables
-Requires:	net-tools
-Requires:	iproute
-Requires:	nftables
-Requires:	socat
-Requires:	qubes-core-agent = %{version}
-Requires:	tinyproxy
-Conflicts:	qubes-core-vm < 4.0.0
+Summary:        Networking support for Qubes VM
+Requires:       ethtool
+Requires:       iptables
+Requires:       net-tools
+Requires:       iproute
+Requires:       nftables
+Requires:       socat
+Requires:       qubes-core-agent = %{version}
+Requires:       tinyproxy
+Conflicts:      qubes-core-vm < 4.0.0
 
 %description networking
 This package provides:
@@ -250,12 +250,12 @@ Note: if you want to use NetworkManager (you do want it in NetVM), install also
 qubes-core-agent-network-manager.
 
 %package network-manager
-Summary:	NetworkManager integration for Qubes VM
+Summary:        NetworkManager integration for Qubes VM
 # to show/hide nm-applet
-Requires:	NetworkManager >= 0.8.1-1
-Requires:	glib2
-Requires:	qubes-core-agent-networking = %{version}
-Conflicts:	qubes-core-vm < 4.0.0
+Requires:       NetworkManager >= 0.8.1-1
+Requires:       glib2
+Requires:       qubes-core-agent-networking = %{version}
+Conflicts:      qubes-core-vm < 4.0.0
 
 %description network-manager
 Integration of NetworkManager for Qubes VM:
@@ -264,8 +264,8 @@ Integration of NetworkManager for Qubes VM:
  * show/hide NetworkManager applet icon
 
 %package passwordless-root
-Summary:	Passwordless root access from normal user
-Conflicts:	qubes-core-vm < 4.0.0
+Summary:        Passwordless root access from normal user
+Conflicts:      qubes-core-vm < 4.0.0
 
 %description passwordless-root
 Configure sudo, PolicyKit and similar tool to not ask for any password when
@@ -274,8 +274,8 @@ already from normal user account, there is not much more to guard there. Qubes
 VM is a single user system.
 
 %package thunar
-Summary:	Thunar support for Qubes VM tools
-Requires:	Thunar
+Summary:        Thunar support for Qubes VM tools
+Requires:       Thunar
 
 %description thunar
 Thunar support for Qubes VM tools
@@ -289,7 +289,7 @@ Thunar support for Qubes VM tools
 %build
 %{?set_build_flags}
 for dir in qubes-rpc misc; do
-	make -C $dir BACKEND_VMM=@BACKEND_VMM@
+    make -C $dir BACKEND_VMM=@BACKEND_VMM@
 done
 make -C doc manpages
 
@@ -297,19 +297,19 @@ make -C doc manpages
 # Make sure there is a qubes group
 groupadd --force --system --gid 98 qubes
 id -u 'user' >/dev/null 2>&1 || {
-	useradd --user-group --create-home --shell /bin/bash user
+    useradd --user-group --create-home --shell /bin/bash user
 }
 usermod -a --groups qubes user
 
 if [ "$1" != 1 ]; then
-	# do this whole %%pre thing only when updating for the first time...
-	exit 0
+    # do this whole %%pre thing only when updating for the first time...
+    exit 0
 fi
 
 mkdir -p /var/lib/qubes
 
 if [ -e /etc/fstab ]; then
-	mv /etc/fstab /var/lib/qubes/fstab.orig
+    mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 
 usermod -L user
@@ -337,61 +337,61 @@ make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
 
 %if 0%{?rhel} >= 7
 sed -i \
-	-e 's:-primary:-centos:' \
-	-e 's:/fc:/centos:' \
-	$RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
+    -e 's:-primary:-centos:' \
+    -e 's:/fc:/centos:' \
+    $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
-	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
+    cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
 %triggerin -- grub2-tools
 if ! grep -q /etc/default/grub.qubes /etc/default/grub 2>/dev/null; then
-	# do not keep Qubes-related settings directly in user-controlled config,
-	# include another file
-	echo '. /etc/default/grub.qubes' >> /etc/default/grub
+    # do not keep Qubes-related settings directly in user-controlled config,
+    # include another file
+    echo '. /etc/default/grub.qubes' >> /etc/default/grub
 fi
 
 %post
 # disable some Upstart services
 for F in plymouth-shutdown prefdm splash-manager start-ttys tty; do
-	if [ -e /etc/init/$F.conf ]; then
-		mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
-	fi
+    if [ -e /etc/init/$F.conf ]; then
+        mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
+    fi
 done
 
 chgrp user /var/lib/qubes/dom0-updates
 
 # Remove old firmware updates link
 if [ -L /lib/firmware/updates ]; then
-	rm -f /lib/firmware/updates
+    rm -f /lib/firmware/updates
 fi
 
 # convert /usr/local symlink to a mount point
 if [ -L /usr/local ]; then
-	rm -f /usr/local
-	mkdir /usr/local
-	mount /usr/local || :
+    rm -f /usr/local
+    mkdir /usr/local
+    mount /usr/local || :
 fi
 
 # workaround for Fedora's systemd package bug
 # https://bugzilla.redhat.com/1559286
 if [ -d /var/lib/private ]; then
-	chmod 700 /var/lib/private
+    chmod 700 /var/lib/private
 fi
 
 if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-	echo >> /etc/yum.conf
-	echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-	echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
+    echo >> /etc/yum.conf
+    echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
+    echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 fi
 
 if ! [ -r /etc/dconf/profile/user ]; then
-	mkdir -p /etc/dconf/profile
-	echo "user-db:user" >> /etc/dconf/profile/user
-	echo "system-db:local" >> /etc/dconf/profile/user
+    mkdir -p /etc/dconf/profile
+    echo "user-db:user" >> /etc/dconf/profile/user
+    echo "system-db:local" >> /etc/dconf/profile/user
 fi
 
 dconf update &> /dev/null || :
@@ -405,34 +405,34 @@ mkdir -p /etc/qubes/protected-files.d
 
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
 if ! is_protected_file /etc/hosts; then
-	if ! grep -q localhost /etc/hosts; then
-		cat <<EOF > /etc/hosts
+    if ! grep -q localhost /etc/hosts; then
+        cat <<EOF > /etc/hosts
 127.0.0.1    localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
 ::1    localhost localhost.localdomain localhost6 localhost6.localdomain6
 EOF
-	fi
+    fi
 fi
 
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
 if ! is_protected_file /etc/hostname; then
-	for ip in '127\.0\.0\.1' '::1'; do
-		if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-			sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
-			sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
-		else
-			echo "${ip} `hostname`" >> /etc/hosts
-		fi
-	done
+    for ip in '127\.0\.0\.1' '::1'; do
+        if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+            sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
+            sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
+        else
+            echo "${ip} `hostname`" >> /etc/hosts
+        fi
+    done
 fi
 
 if [ "$1" != 1 ]; then
-	# do the rest of %%post thing only when updating for the first time...
-	exit 0
+    # do the rest of %%post thing only when updating for the first time...
+    exit 0
 fi
 
 if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ]; then
-	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+    cp /etc/init/serial.conf /var/lib/qubes/serial.orig
 fi
 
 # Remove most of the udev scripts to speed up the VM boot time
@@ -441,15 +441,15 @@ fi
 #echo "--> Removing unnecessary udev scripts..."
 mkdir -p /var/lib/qubes/removed-udev-scripts
 for f in /etc/udev/rules.d/*; do
-	if [ $(basename $f) == "xen-backend.rules" ]; then
-		continue
-	fi
+    if [ $(basename $f) == "xen-backend.rules" ]; then
+        continue
+    fi
 
-	if echo $f | grep -q qubes; then
-		continue
-	fi
+    if echo $f | grep -q qubes; then
+        continue
+    fi
 
-	mv $f /var/lib/qubes/removed-udev-scripts/
+    mv $f /var/lib/qubes/removed-udev-scripts/
 done
 mkdir -p /rw
 
@@ -461,7 +461,7 @@ mkdir -p /rw
 %triggerin -- notification-daemon
 # Enable autostart of notification-daemon when installed
 if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
-	ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+    ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
 fi
 exit 0
 
@@ -496,30 +496,30 @@ sed 's/^net.ipv4.ip_forward.*/#\0/' -i /etc/sysctl.conf
 
 %post thunar
 if [ "$1" = 1 ]; then
-	# There is no system-wide Thunar custom actions. There is only a default
-	# file and a user file created from the default one. Qubes actions need
-	# to be placed after all already defined actions and before </actions>
-	# the end of file.
-	if [ -f /etc/xdg/Thunar/uca.xml ]; then
-		cp -p /etc/xdg/Thunar/uca.xml{,.bak}
-		sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
-	fi
-	if [ -f /home/user/.config/Thunar/uca.xml ]; then
-		cp -p /home/user/.config/Thunar/uca.xml{,.bak}
-		sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /home/user/.config/Thunar/uca.xml
-	fi
+    # There is no system-wide Thunar custom actions. There is only a default
+    # file and a user file created from the default one. Qubes actions need
+    # to be placed after all already defined actions and before </actions>
+    # the end of file.
+    if [ -f /etc/xdg/Thunar/uca.xml ]; then
+        cp -p /etc/xdg/Thunar/uca.xml{,.bak}
+        sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
+    fi
+    if [ -f /home/user/.config/Thunar/uca.xml ]; then
+        cp -p /home/user/.config/Thunar/uca.xml{,.bak}
+        sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /home/user/.config/Thunar/uca.xml
+    fi
 fi
 
 %preun
 if [ "$1" = 0 ]; then
-	# no more packages left
-	if [ -e /var/lib/qubes/fstab.orig ]; then
-		mv /var/lib/qubes/fstab.orig /etc/fstab
-	fi
-	mv /var/lib/qubes/removed-udev-scripts/* /etc/udev/rules.d/
-	if [ -e /var/lib/qubes/serial.orig ]; then
-		mv /var/lib/qubes/serial.orig /etc/init/serial.conf
-	fi
+    # no more packages left
+    if [ -e /var/lib/qubes/fstab.orig ]; then
+        mv /var/lib/qubes/fstab.orig /etc/fstab
+    fi
+    mv /var/lib/qubes/removed-udev-scripts/* /etc/udev/rules.d/
+    if [ -e /var/lib/qubes/serial.orig ]; then
+        mv /var/lib/qubes/serial.orig /etc/init/serial.conf
+    fi
 fi
 
 %preun networking
@@ -533,28 +533,28 @@ fi
 
 %postun thunar
 if [ "$1" = 0 ]; then
-	if [ -f /etc/xdg/Thunar/uca.xml ]; then
-		mv /etc/xdg/Thunar/uca.xml{,.uninstall}
-		mv /etc/xdg/Thunar/uca.xml{.bak,}
-	fi
-	if [ -f /home/user/.config/Thunar/uca.xml ]; then
-		mv /home/user/.config/Thunar/uca.xml{,.uninstall}
-		mv /home/user/.config/Thunar/uca.xml{.bak,}
-	fi
+    if [ -f /etc/xdg/Thunar/uca.xml ]; then
+        mv /etc/xdg/Thunar/uca.xml{,.uninstall}
+        mv /etc/xdg/Thunar/uca.xml{.bak,}
+    fi
+    if [ -f /home/user/.config/Thunar/uca.xml ]; then
+        mv /home/user/.config/Thunar/uca.xml{,.uninstall}
+        mv /home/user/.config/Thunar/uca.xml{.bak,}
+    fi
 fi
 
 %postun
 if [ $1 -eq 0 ]; then
-	/usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
-	if [ -L /lib/firmware/updates ]; then
-		rm /lib/firmware/updates
-	fi
-	rm -rf /var/lib/qubes/xdg
+    /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
+    if [ -L /lib/firmware/updates ]; then
+        rm /lib/firmware/updates
+    fi
+    rm -rf /var/lib/qubes/xdg
 fi
 
 %postun passwordless-root
 if [ $1 -eq 0 ]; then
-	usermod -p '*' root
+    usermod -p '*' root
 fi
 
 %posttrans
@@ -782,17 +782,17 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 
 %package sysvinit
-Summary:	Qubes unit files for SysV init style or upstart
-License:	GPL v2 only
-Group:		Qubes
-Requires:	upstart
-Requires:	qubes-core-agent = %{version}
-Requires:	qubes-core-qrexec-vm
-Requires:	qubes-core-agent-networking = %{version}
-Provides:	qubes-core-agent-init-scripts
-Conflicts:	qubes-core-agent-systemd
-Provides:	qubes-core-vm-sysvinit = %{version}-%{release}
-Obsoletes:	qubes-core-vm-sysvinit < 4.0.0
+Summary:        Qubes unit files for SysV init style or upstart
+License:        GPL v2 only
+Group:          Qubes
+Requires:       upstart
+Requires:       qubes-core-agent = %{version}
+Requires:       qubes-core-qrexec-vm
+Requires:       qubes-core-agent-networking = %{version}
+Provides:       qubes-core-agent-init-scripts
+Conflicts:      qubes-core-agent-systemd
+Provides:       qubes-core-vm-sysvinit = %{version}-%{release}
+Obsoletes:      qubes-core-vm-sysvinit < 4.0.0
 
 %description sysvinit
 The Qubes core startup configuration for SysV init (or upstart).
@@ -813,14 +813,14 @@ The Qubes core startup configuration for SysV init (or upstart).
 #echo "--> Turning off unnecessary services..."
 # FIXME: perhaps there is more elegant way to do this?
 for f in /etc/init.d/*; do
-	srv=`basename $f`
-	[ $srv = 'functions' ] && continue
-	[ $srv = 'killall' ] && continue
-	[ $srv = 'halt' ] && continue
-	[ $srv = 'single' ] && continue
-	[ $srv = 'reboot' ] && continue
-	[ $srv = 'qubes-gui' ] && continue
-	chkconfig $srv off
+    srv=`basename $f`
+    [ $srv = 'functions' ] && continue
+    [ $srv = 'killall' ] && continue
+    [ $srv = 'halt' ] && continue
+    [ $srv = 'single' ] && continue
+    [ $srv = 'reboot' ] && continue
+    [ $srv = 'qubes-gui' ] && continue
+    chkconfig $srv off
 done
 
 #echo "--> Enabling essential services..."
@@ -828,11 +828,11 @@ chkconfig rsyslog on
 chkconfig haldaemon on
 chkconfig messagebus on
 for svc in %qubes_services; do
-	if [ "$1" = 1 ]; then
-		chkconfig --add $svc || echo "WARNING: Cannot add service $svc!"
-	else
-		chkconfig $svc resetpriorities || echo "WARNING: Cannot reset priorities of service $svc!"
-	fi
+    if [ "$1" = 1 ]; then
+        chkconfig --add $svc || echo "WARNING: Cannot add service $svc!"
+    else
+        chkconfig $svc resetpriorities || echo "WARNING: Cannot reset priorities of service $svc!"
+    fi
 done
 
 # TODO: make this not display the silly message about security context...
@@ -840,31 +840,31 @@ sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
 
 %preun sysvinit
 if [ "$1" = 0 ]; then
-	# no more packages left
-	for svc in %qubes_services; do
-		chkconfig --del $svc
-	done
+    # no more packages left
+    for svc in %qubes_services; do
+        chkconfig --del $svc
+    done
 fi
 
 %package systemd
-Summary:	Qubes unit files for systemd init style
-License:	GPL v2 only
-Group:		Qubes
-Requires:	systemd
+Summary:        Qubes unit files for systemd init style
+License:        GPL v2 only
+Group:          Qubes
+Requires:       systemd
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires(post):	systemd
-Requires(preun):	systemd
-Requires(postun):	systemd
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
 %else
-Requires(post):	systemd-units
-Requires(preun):	systemd-units
-Requires(postun):	systemd-units
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
 %endif
-Requires:	qubes-core-agent = %{version}
-Provides:	qubes-core-agent-init-scripts
-Conflicts:	qubes-core-agent-sysvinit
-Provides:	qubes-core-vm-systemd = %{version}-%{release}
-Obsoletes:	qubes-core-vm-systemd < 4.0.0
+Requires:       qubes-core-agent = %{version}
+Provides:       qubes-core-agent-init-scripts
+Conflicts:      qubes-core-agent-sysvinit
+Provides:       qubes-core-vm-systemd = %{version}-%{release}
+Obsoletes:      qubes-core-vm-systemd < 4.0.0
 
 %description systemd
 The Qubes core startup configuration for systemd init.
@@ -912,52 +912,52 @@ changed=
 
 %scriptletfuns
 if [ $1 -eq 1 ]; then
-	preset_units %{_presetdir}/%qubes_preset_file initial
-	changed=true
+    preset_units %{_presetdir}/%qubes_preset_file initial
+    changed=true
 else
-	preset_units %{_presetdir}/%qubes_preset_file upgrade
-	changed=true
-	# Upgrade path - now qubes-iptables is used instead
-	for svc in iptables ip6tables; do
-		if [ -f "$svc".service ]; then
-			systemctl --no-reload preset "$svc".service
-			changed=true
-		fi
-	done
+    preset_units %{_presetdir}/%qubes_preset_file upgrade
+    changed=true
+    # Upgrade path - now qubes-iptables is used instead
+    for svc in iptables ip6tables; do
+        if [ -f "$svc".service ]; then
+            systemctl --no-reload preset "$svc".service
+            changed=true
+        fi
+    done
 fi
 
 if [ $1 -eq 1 ]; then
-	# First install.
-	# Set default "runlevel".
-	# FIXME: this ought to be done via kernel command-line.
-	# The fewer deviations of the template from the seed image, the better.
-	rm -f %{_sysconfdir}/systemd/system/default.target
-	ln -s %{_unitdir}/multi-user.target %{_sysconfdir}/systemd/system/default.target
-	changed=true
+    # First install.
+    # Set default "runlevel".
+    # FIXME: this ought to be done via kernel command-line.
+    # The fewer deviations of the template from the seed image, the better.
+    rm -f %{_sysconfdir}/systemd/system/default.target
+    ln -s %{_unitdir}/multi-user.target %{_sysconfdir}/systemd/system/default.target
+    changed=true
 fi
 
 # remove old symlinks
 if [ -L %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
-	rm -f %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service
-	changed=true
+    rm -f %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service
+    changed=true
 fi
 
 if [ -L %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service ]; then
-	rm -f %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service
-	changed=true
+    rm -f %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service
+    changed=true
 fi
 
 if [ "x$changed" != "x" ]; then
-	systemctl daemon-reload
+    systemctl daemon-reload
 fi
 
 %preun systemd
 if [ $1 -eq 0 ]; then
-	# Run this only during uninstall.
-	# Save the preset file to later use it to re-preset services there once
-	# the Qubes OS preset file is removed.
-	mkdir -p %{_rundir}/qubes-uninstall
-	cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
+    # Run this only during uninstall.
+    # Save the preset file to later use it to re-preset services there once
+    # the Qubes OS preset file is removed.
+    mkdir -p %{_rundir}/qubes-uninstall
+    cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
 fi
 
 %postun systemd
@@ -965,15 +965,15 @@ changed=
 
 %scriptletfuns
 if [ -d %{_rundir}/qubes-uninstall ]; then
-	# We have a saved preset file (or more).
-	# Re-preset the units mentioned there.
-	restore_units %{_rundir}/qubes-uninstall/%qubes_preset_file
-	rm -rf %{_rundir}/qubes-uninstall
-	changed=true
+    # We have a saved preset file (or more).
+    # Re-preset the units mentioned there.
+    restore_units %{_rundir}/qubes-uninstall/%qubes_preset_file
+    rm -rf %{_rundir}/qubes-uninstall
+    changed=true
 fi
 
 if [ "x$changed" != "x" ]; then
-	systemctl daemon-reload
+    systemctl daemon-reload
 fi
 
 %changelog
