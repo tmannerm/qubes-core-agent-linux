@@ -3,7 +3,7 @@ RPMS_DIR=rpm/
 VERSION := $(shell cat version)
 
 LIBDIR ?= /usr/lib
-SYSLIBDIR ?= /lib
+SYSLIBDIR ?= /usr/lib
 
 PYTHON ?= /usr/bin/python3
 
@@ -49,7 +49,7 @@ all:
 	$(MAKE) -C qubes-rpc
 
 # Dropin Directory
-SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
+SYSTEM_DROPIN_DIR ?= "usr/lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
