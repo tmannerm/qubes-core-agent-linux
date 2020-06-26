@@ -9,7 +9,7 @@ APPLICATIONSDIR ?= /usr/share/applications
 SBINDIR ?= /usr/sbin
 BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
-SYSLIBDIR ?= /lib
+SYSLIBDIR ?= /usr/lib
 
 PYTHON ?= /usr/bin/python3
 PYTHON_SITEARCH = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)')
@@ -60,7 +60,7 @@ all:
 	make -C qubes-rpc
 
 # Dropin Directory
-SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
+SYSTEM_DROPIN_DIR ?= "usr/lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
