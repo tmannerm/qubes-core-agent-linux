@@ -7,7 +7,7 @@ KDESERVICEDIR ?= /usr/share/kde4/services
 KDE5SERVICEDIR ?= /usr/share/kservices5/ServiceMenus/
 SBINDIR ?= /usr/sbin
 LIBDIR ?= /usr/lib
-SYSLIBDIR ?= /lib
+SYSLIBDIR ?= /usr/lib
 
 PYTHON = /usr/bin/python2
 PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
@@ -54,7 +54,7 @@ all:
 	make -C qubes-rpc
 
 # Dropin Directory
-SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
+SYSTEM_DROPIN_DIR ?= "usr/lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := chronyd.service crond.service
