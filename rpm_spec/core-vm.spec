@@ -240,22 +240,8 @@ usermod -p '' root
 usermod -L user
 
 %install
+(cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
-make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
-make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
-make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
-make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
-make -C misc DESTDIR=$RPM_BUILD_ROOT install
-make -C network DESTDIR=$RPM_BUILD_ROOT install
-make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install install-dnf
-%if 0%{?rhel} == 7
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
-%endif
 
 %if 0%{?fedora} >= 22
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
