@@ -148,7 +148,7 @@ Requires:       librsvg2-tools
 %endif
 Requires:       zenity
 Requires:       dconf
-Requires:       qubes-core-qrexec-vm
+Requires:       qubes-core-agent-qrexec
 Requires:       qubes-libvchan
 Requires:       qubes-db-vm
 Requires:       python%{python3_pkgversion}-dnf-plugins-qubes-hooks
@@ -288,7 +288,7 @@ Thunar support for Qubes VM tools
 
 %build
 %{?set_build_flags}
-for dir in qubes-rpc misc; do
+for dir in qubes-rpc qrexec misc; do
     make -C $dir BACKEND_VMM=@BACKEND_VMM@
 done
 make -C doc manpages
@@ -318,22 +318,8 @@ usermod -L user
 usermod -p '' root
 
 %install
+(cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
-make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
-make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
-make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
-make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
-make -C misc DESTDIR=$RPM_BUILD_ROOT install
-make -C network DESTDIR=$RPM_BUILD_ROOT install
-make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
-make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install install-dnf
-%if 0%{?rhel} == 7
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
-%endif
 
 %if 0%{?rhel} >= 7
 sed -i \
@@ -725,7 +711,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qrexec-client-vm
 /usr/lib/qubes/qrexec_client_vm
 /usr/lib/qubes/qubes-rpc-multiplexer
-/lib/systemd/system/qubes-qrexec-agent.service
+%{_unitdir}/qubes-qrexec-agent.service
 %{_mandir}/man1/qrexec-client-vm.1*
 
 %files nautilus
@@ -787,7 +773,7 @@ License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
 Requires:       qubes-core-agent = %{version}
-Requires:       qubes-core-qrexec-vm
+Requires:       qubes-core-agent-qrexec = %{version}
 Requires:       qubes-core-agent-networking = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-systemd
