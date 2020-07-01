@@ -25,6 +25,8 @@ else ifeq ($(shell lsb_release -is), Ubuntu)
 	install -D -m 0644 qrexec.pam.debian $(DESTDIR)/etc/pam.d/qrexec
 else ifeq ($(shell lsb_release -is), Arch)
 	install -D -m 0644 qrexec.pam.archlinux $(DESTDIR)/etc/pam.d/qrexec
+else ifeq ($(shell lsb_release -is), openSUSE)
+	install -D -m 0644 qrexec.pam.opensuse $(DESTDIR)/etc/pam.d/qrexec
 else
 	install -D -m 0644 qrexec.pam $(DESTDIR)/etc/pam.d/qrexec
 endif
