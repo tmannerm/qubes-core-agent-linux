@@ -246,6 +246,15 @@ make install-vm DESTDIR=$RPM_BUILD_ROOT
 %if 0%{?fedora} >= 22
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
+# Adjust installed repo file for openSUSE
+# Also for now not finding repodata is not fatal
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+sed -i \
+    -e 's:-primary:-opensuse:' \
+    -e 's:/fc:/opensuse/leap/:' \
+    -e 's:False:True:' \
+    $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
+%endif
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
