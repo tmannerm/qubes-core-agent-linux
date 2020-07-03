@@ -11,8 +11,8 @@ if [ x$ip != x ]; then
     gateway=`/usr/bin/qubesdb-read /qubes-gateway`
     primary_dns=`/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo $gateway`
     secondary_dns=`/usr/bin/qubesdb-read /qubes-secondary-dns`
-    /sbin/ethtool -K $INTERFACE sg off
-    /sbin/ethtool -K $INTERFACE tx off
+    /usr/sbin/ethtool -K $INTERFACE sg off
+    /usr/sbin/ethtool -K $INTERFACE tx off
     # If NetworkManager is enabled, let it configure the network
     if qsvc network-manager ; then
         nm_config=/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
@@ -48,11 +48,11 @@ __EOF__
         nmcli connection load $nm_config || :
     else
         # No NetworkManager enabled, configure the network manually
-        /sbin/ifconfig $INTERFACE $ip netmask 255.255.255.255
-        /sbin/ifconfig $INTERFACE up
-        /sbin/route add -host $gateway dev $INTERFACE
+        /usr/sbin/ip add "$ip/255.255.255.255" dev "$INTERFACE"
+        /usr/sbin/ip link set dev "$INTERFACE" up
+        /usr/sbin/ip route add scope host "$gateway" dev "$INTERFACE"
         if ! qsvc disable-default-route ; then
-            /sbin/route add default gw $gateway
+            /user/sbin/ip route add default via $gateway
         fi
         if ! is_protected_file /etc/resolv.conf ; then
             echo > /etc/resolv.conf

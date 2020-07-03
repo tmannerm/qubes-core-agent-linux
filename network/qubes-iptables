@@ -21,8 +21,8 @@
 IPTABLES=iptables
 IPTABLES_DATA_DIR=/etc/qubes
 
-if [ ! -x /sbin/$IPTABLES ]; then
-    echo $"${IPTABLES}: /sbin/$IPTABLES does not exist."
+if [ ! -x /usr/sbin/$IPTABLES ]; then
+    echo $"${IPTABLES}: /usr/sbin/$IPTABLES does not exist."
     exit 5
 fi
 
