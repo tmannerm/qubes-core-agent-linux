@@ -16,21 +16,21 @@ configure_network() {
     local primary_dns="$9"
     local secondary_dns="${10}"
 
-    /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
+    /usr/sbin/ip address add "$ip/$netmask" dev "$INTERFACE"
     if [ -n "$ip6" ]; then
-        /sbin/ifconfig "$INTERFACE" add "$ip6/$netmask6"
+        /usr/sbin/ip address add "$ip6/$netmask6" dev "$INTERFACE"
     fi
-    /sbin/ifconfig "$INTERFACE" up
+    /usr/sbin/ip link set dev "$INTERFACE" up
 
     if [ -n "$gateway" ]; then
-        /sbin/route add -host "$gateway" dev "$INTERFACE"
+        /usr/sbin/ip route add scope host "$gateway" dev "$INTERFACE"
         if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
-            /sbin/route -6 add "$gateway6/$netmask6" dev "$INTERFACE"
+            /usr/sbin/ip -6 route add "$gateway6/$netmask6" dev "$INTERFACE"
         fi
         if ! qsvc disable-default-route ; then
-            /sbin/route add default gw "$gateway"
+            /usr/sbin/ip route add default via "$gateway"
             if [ -n "$gateway6" ]; then
-                /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+                /usr/sbin/ip -6 route add default via "$gateway6" dev "$INTERFACE"
             fi
         fi
     fi
@@ -198,8 +198,8 @@ if [ -n "$INTERFACE" ]; then
             secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null)
 
             if [ -n "$ip" ]; then
-                /sbin/ethtool -K "$INTERFACE" sg off
-                /sbin/ethtool -K "$INTERFACE" tx off
+                /usr/sbin/ethtool -K "$INTERFACE" sg off
+                /usr/sbin/ethtool -K "$INTERFACE" tx off
 
                 # If NetworkManager is enabled, let it configure the network
                 if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
