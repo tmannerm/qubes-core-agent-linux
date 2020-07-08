@@ -295,6 +295,10 @@ ifeq ($(shell lsb_release -is), Debian)
 	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 else ifeq ($(shell lsb_release -is), Ubuntu)
 	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+else ifeq ($(shell lsb_release -is), openSUSE)
+	install -d $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	touch $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/__init__.py
+	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 else
 	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 endif

@@ -111,39 +111,47 @@ Requires:	xdg-utils
 Requires:   ethtool
 Requires:   iptables
 Requires:   tinyproxy
-Requires:   ntpdate
 Requires:   net-tools
-Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 3.2.7
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:       insserv-compat
+Requires:   insserv-compat
+Requires:   /usr/sbin/ntpdate
+Requires:   python3-nautilus
 %else
-Requires:       initscripts
+Requires:   initscripts
+Requires:   ntpdate
+Requires:   nautilus-python
 %endif
 Requires:   gawk
 Requires:   sed
 # for dispvm-prerun.sh
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+Requires:   procps
+%else
 Requires:   procps-ng
+%endif
 Requires:   util-linux
 # for qubes-desktop-run
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:       python3-gobject
-Requires:       python3-dbus-python
+Requires:   python3-gobject
+Requires:   python3-dbus-python
 %else
 Requires:   pygobject3-base
 Requires:   dbus-python
 %endif
 # for qubes-session-autostart, xdg-icon
-Requires:   pyxdg
 Requires:   ImageMagick
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:       rsvg-view
+Requires:   python2-pyxdg
+Requires:   rsvg-view
+Requires:   mate-notification-daemon
 %else
-Requires:       librsvg2-tools
+Requires:   pyxdg
+Requires:   librsvg2-tools
+Requires:   desktop-notification-daemon
 %endif
 Requires:   fakeroot
-Requires:   desktop-notification-daemon
 # to show/hide nm-applet
 Requires:   dconf
 Requires:   pygtk2
@@ -151,7 +159,7 @@ Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 Requires:   tar
-%if 0%{?fedora} >= 23
+%if 0%{?fedora} >= 23  || 0%{?is_opensuse}
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
@@ -575,6 +583,9 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
+%if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
+/usr/lib64/python2.7/site-packages/qubes/__init__.py*
+%endif
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
@@ -596,7 +607,7 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
-%if 0%{?fedora} >= 23
+%if 0%{?fedora} >= 23 || 0%{?is_opensuse}
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
