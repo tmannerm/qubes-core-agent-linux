@@ -142,7 +142,7 @@ Requires:       python%{python3_pkgversion}-daemon
 Requires:       python%{python3_pkgversion}-qubesdb
 Requires:       ImageMagick
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:       rsvg-view
+Requires:       /usr/bin/rsvg-convert
 %else
 Requires:       librsvg2-tools
 %endif
