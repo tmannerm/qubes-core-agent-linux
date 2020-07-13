@@ -134,8 +134,8 @@ Requires:   procps-ng
 Requires:   util-linux
 # for qubes-desktop-run
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:   python3-gobject
-Requires:   python3-dbus-python
+Requires:   python2-gobject
+Requires:   python2-dbus-python
 %else
 Requires:   pygobject3-base
 Requires:   dbus-python
@@ -144,7 +144,7 @@ Requires:   dbus-python
 Requires:   ImageMagick
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
 Requires:   python2-pyxdg
-Requires:   rsvg-view
+Requires:   /usr/bin/rsvg-convert
 Requires:   mate-notification-daemon
 %else
 Requires:   pyxdg
