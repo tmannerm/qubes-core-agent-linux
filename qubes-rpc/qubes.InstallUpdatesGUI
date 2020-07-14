@@ -8,6 +8,9 @@ if [ -e /etc/redhat-release -a -x /usr/bin/dnf ]; then
     update_cmd='dnf update --best'
 elif [ -e /etc/redhat-release -a -x /usr/bin/yum ]; then
     update_cmd='yum update'
+elif [ -e /etc/os-release ]; then
+    # SUSE
+    update_cmd='dnf update'
 elif [ -e /etc/debian_version ]; then
     update_cmd='apt-get update && apt-get -V dist-upgrade'
 elif [ -e /etc/arch-release -a -x /usr/bin/powerpill ]; then

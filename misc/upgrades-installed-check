@@ -7,8 +7,8 @@
 ##
 ## Forwards the exit code of the package manager.
 
-if [ -e /etc/system-release ]; then
-   ## Fedora
+if [ -e /etc/system-release || -e /etc/os-release ]; then
+   ## Fedora or SUSE
    yum_output="$(yum -q check-update 2>&1)"
    exit_code="$?"
    [ "$exit_code" -eq 100 ] && echo "false" && exit 0
