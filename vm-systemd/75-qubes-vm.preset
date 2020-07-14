@@ -42,6 +42,13 @@ disable sm-client.service
 disable sshd.service
 disable backuppc.service
 
+# SUSE only services
+disable wicked.service
+disable wickedd-auto4.service
+disable wickedd-dhcp4.service
+disable wickedd-dhcp6.service
+disable wickedd-nanny.service
+
 # Units below this line will be re-preset on package upgrade
 
 disable alsa-store.service
