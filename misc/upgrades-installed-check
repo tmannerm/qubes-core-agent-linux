@@ -7,7 +7,11 @@
 ##
 ## Forwards the exit code of the package manager.
 
-if [ -e /etc/system-release || -e /etc/os-release ]; then
+# Source standard release file, if it exists
+# shellcheck disable=SC1091   # installed on target OS via release package
+if [ -e /etc/os-release ]; then . /etc/os-release; fi
+
+if [ -e /etc/system-release ] || [[ $ID_LIKE == *"suse"* ]]; then
    ## Fedora or SUSE
    yum_output="$(yum -q check-update 2>&1)"
    exit_code="$?"
