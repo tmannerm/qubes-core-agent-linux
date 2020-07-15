@@ -8,10 +8,10 @@ etc/tinyproxy/updates-blacklist
 etc/udev/rules.d/99-qubes-network.rules
 etc/xen/scripts/vif-qubes-nat.sh
 etc/xen/scripts/vif-route-qubes
-lib/systemd/system/qubes-firewall.service
-lib/systemd/system/qubes-iptables.service
-lib/systemd/system/qubes-network.service
-lib/systemd/system/qubes-updates-proxy.service
+usr/lib/systemd/system/qubes-firewall.service
+usr/lib/systemd/system/qubes-iptables.service
+usr/lib/systemd/system/qubes-network.service
+usr/lib/systemd/system/qubes-updates-proxy.service
 usr/lib/qubes/init/network-proxy-setup.sh
 usr/lib/qubes/init/qubes-iptables
 usr/lib/qubes/iptables-updates-proxy

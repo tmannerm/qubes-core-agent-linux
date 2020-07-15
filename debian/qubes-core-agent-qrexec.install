@@ -1,6 +1,6 @@
 etc/pam.d/qrexec
 etc/qubes/rpc-config/README
-lib/systemd/system/qubes-qrexec-agent.service
+usr/lib/systemd/system/qubes-qrexec-agent.service
 usr/bin/qrexec-client-vm
 usr/bin/qrexec-fork-server
 usr/lib/qubes/qrexec-agent
