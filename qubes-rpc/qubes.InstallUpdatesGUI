@@ -1,13 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script should open some GUI to install updates.
 # If you are creating package for other distribution, feel free to replace it
 # with distribution-specific script.
 
+# Source standard release file, if it exists
+# shellcheck disable=SC1091   # installed on target OS via release package
+if [ -e /etc/os-release ]; then . /etc/os-release; fi
+
 if [ -e /etc/redhat-release ] && [ -x /usr/bin/dnf ]; then
     update_cmd='dnf update --best'
 elif [ -e /etc/redhat-release ] && [ -x /usr/bin/yum ]; then
     update_cmd='yum update'
+elif [[ $ID_LIKE == *"suse"* ]]; then
+    update_cmd='dnf update'
 elif [ -e /etc/debian_version ]; then
     update_cmd='apt-get update && apt-get -V dist-upgrade'
 elif [ -e /etc/arch-release ] && [ -x /usr/bin/powerpill ]; then
