@@ -199,7 +199,11 @@ DNF plugin for Qubes specific post-installation actions:
 
 %package -n qubes-core-agent-thunar
 Summary: Thunar support for Qubes VM tools
+%if 0%{?suse_version} == 1500
+Requires: thunar
+%else
 Requires: Thunar
+%endif
 
 %description -n qubes-core-agent-thunar
 Thunar support for Qubes VM tools
