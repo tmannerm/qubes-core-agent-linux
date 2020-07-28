@@ -52,7 +52,7 @@ etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
 etc/systemd/system/haveged.service
 etc/udev/rules.d/50-qubes-misc.rules
-lib/modules-load.d/qubes-core.conf
+usr/lib/modules-load.d/qubes-core.conf
 usr/lib/systemd/system-preset/75-qubes-vm.preset
 usr/lib/systemd/system/boot.automount.d/30_qubes.conf
 usr/lib/systemd/system/ModemManager.service.d/30_qubes.conf
