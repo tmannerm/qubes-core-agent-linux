@@ -28,6 +28,13 @@
 %global python3_pkgversion 3
 %endif
 
+# GRUB tools package is named differently on openSUSE
+%if 0%{?suse_version} == 1500
+%define grub_pkg_name grub2
+%else
+%define grub_pkg_name grub2-tools
+%endif
+
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -346,7 +353,7 @@ if [ -e /etc/init/serial.conf ]; then
     cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
-%triggerin -- grub2-tools
+%triggerin -- %{grub_pkg_name}
 if ! grep -q /etc/default/grub.qubes /etc/default/grub 2>/dev/null; then
     # do not keep Qubes-related settings directly in user-controlled config,
     # include another file
