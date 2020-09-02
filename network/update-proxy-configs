@@ -133,6 +133,17 @@ EOF
     fi
 fi
 
+# Zypper uses the proxy set for system which can be set easily using yast
+if [ -e /etc/sysconfig/proxy ] && [ -x /usr/sbin/yast ]; then
+    if [ -n "$PROXY_ADDR" ]; then
+        TERM=linux /usr/sbin/yast proxy set http="$PROXY_ADDR"
+        TERM=linux /usr/sbin/yast proxy enable
+    else
+        TERM=linux /usr/sbin/yast proxy disable
+        TERM=linux /usr/sbin/yast proxy set http=" "
+    fi
+fi
+
 # DNF configuration doesn't support including other files
 # https://bugzilla.redhat.com/show_bug.cgi?id=1352234
 if [ -e /etc/dnf/dnf.conf ]; then
