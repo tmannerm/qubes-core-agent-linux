@@ -1,6 +1,8 @@
 [Unit]
 Description=Qubes misc post-boot actions
 After=network-pre.target qubes-mount-dirs.service qubes-network.service qubes-firewall.service
+# On openSUSE, need to make sure proxy env is set correctly before process launcher inherits env
+Before=qubes-gui-agent.service
 
 [Service]
 Type=oneshot
