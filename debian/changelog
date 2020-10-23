@@ -1,3 +1,154 @@
+qubes-core-agent (4.1.17-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * vm-systemd: enable dummy modules and psu client
+
+  [ Saswat Padhi ]
+  * Fixed menu item name
+
+  [ Frédéric Pierret (fepitre) ]
+  * preset: handle dom0 and sys-usb qubes-psu-client
+
+  [ unman ]
+  * Allow build for Focal
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 10 Oct 2020 05:13:44 +0200
+
+qubes-core-agent (4.1.16-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Workaround for gpg not resolving key servers used behing proxy
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: allow bullseye install to fail - no dnf/yum available
+  * rpm: do not build qubes-core-agent-sysvinit package
+  * debian: drop python2 in build deps
+
+  [ Artur Puzio ]
+  * Skip IGD when unbinding device drivers on suspend
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "rpm: do not build qubes-core-agent-sysvinit package"
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: don't build sysvinit for Fedora and CentOS
+
+  [ herypt ]
+  * Advertise apparmor support
+
+  [ WillyPillow ]
+  * New qrexec calls for interacting with template repos.
+  * Remove repofrompath.
+  * Fix shell quoting.
+  * qubes.Template*: Change separator from : to | and include additional
+    metadata.
+  * qubes.Template*: Invoke curl with --silent.
+  * qubes.Template*: Add --refresh option and allow DNF cache to be
+    used.
+  * qvm-template: Add qubes.Template{Search,Download} files to the
+    package.
+
+  [ Peter Gerber ]
+  * passwordless-root: policykit: restrict access to group qubes
+  * passwordless-root: sudo: grant access for group qubes
+
+  [ Rusty Bird ]
+  * bind-dirs: run in DisposableVM, too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 17 Sep 2020 14:37:05 +0200
+
+qubes-core-agent (4.1.15-1) unstable; urgency=medium
+
+  [ Krzysztof Burghardt ]
+  * Fix dependencies for Ubuntu 20.04 LTS (Focal Fossa)
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: handle Gentoo
+
+  [ Ivan Kardykov ]
+  * Fix open path in qubes-open-file-manager.desktop
+
+  [ Frédéric Pierret (fepitre) ]
+  * tinyproxy: support rsync for Gentoo
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix version detection for python3?-nautilus dependency
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop legacy xen entry in fstab
+  * xendriverdomain: remove Requires and After proc-xen.mount
+  * Update travis
+  * Fix regex in qubes-fix-nm-conf.sh
+  * xendriverdomain: remove placeholder for sbinpath
+
+  [ Marek Marczykowski-Górecki ]
+  * qfile-unpacker: add option for custom user and target directory
+  * tar2qfile: fix argument parser
+  * qfile-unpacker: add option (-w) to wait for disk space before
+    extracting
+  * Add services for paranoid backup restore mode
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 07 Aug 2020 03:52:18 +0200
+
+qubes-core-agent (4.1.14-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use legacy distutils.spawn
+
+  [ Frédéric Pierret (fepitre) ]
+  * update-proxy-configs: handle Portage(Gentoo)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 16 Jul 2020 13:37:16 +0200
+
+qubes-core-agent (4.1.13-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * debian: conditional python version dependencies
+  * Fix missing dependency for managing Network-Manager in active user
+    session
+  * Use DNF instead of YUM if exists
+  * debian: add 'rpm' as dependency
+
+  [ Marta Marczykowska-Górecka ]
+  * fixed qubes.GetAppmenus ignoring some correct .desktop files
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "Fix updates notification on Fedora 29"
+  * dnf: update for DNF 4+ API
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 Jun 2020 06:29:35 +0200
+
+qubes-core-agent (4.1.12-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qvm-run-vm: add +WaitForSession for modern @dispvm syntax too
+  * qvm-run-vm: translate --dispvm to modern @dispvm syntax
+  * qvm-run-vm: fix comment
+
+  [ Paweł Marczewski ]
+  * Enable root autologin on serial console
+  * Lock root password in passwordless-root package
+  * Use pam-configs to override Debian PAM config
+  * Override PAM config for su in RPM package
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.ShowInTerminal needs a graphical session running
+
+  [ Marta Marczykowska-Górecka ]
+  * Added a qubes-open-file-manager.desktop file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 25 May 2020 03:35:46 +0200
+
+qubes-core-agent (4.1.11-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: output diagnostics messages to stderr
+
+  [ Frédéric Pierret (fepitre) ]
+  * setup-ip: fallback to legacy if nmcli is no present
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 01 May 2020 02:39:18 +0200
+
 qubes-core-agent (4.1.10-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]

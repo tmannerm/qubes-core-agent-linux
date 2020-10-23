@@ -111,7 +111,11 @@ enable xendriverdomain.service
 enable systemd-timesyncd.service
 enable qubes-sync-time.service
 enable qubes-sync-time.timer
+enable module-load-dummy-psu.service
+enable module-load-dummy-backlight.service
+enable qubes-psu-client@.service default sys-usb
 
 # Disable useless Xen services in Qubes VM
 disable xenstored.service
 disable xenconsoled.service
+disable proc-xen.mount

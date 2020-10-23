@@ -77,7 +77,8 @@ EOF
 
 # Determine whether the proxy should be used
 if qsvc yum-proxy-setup || qsvc updates-proxy-setup ; then
-    PROXY_ADDR="http://127.0.0.1:8082/"
+    PROXY_ADDR_BASE="127.0.0.1:8082"
+    PROXY_ADDR="http://${PROXY_ADDR_BASE}/"
     PROXY_CONF_ENTRY="proxy=$PROXY_ADDR"
 else
     PROXY_ADDR=""
@@ -154,4 +155,19 @@ fi
 # https://bugs.freedesktop.org/show_bug.cgi?id=96788
 if [ -e /etc/PackageKit/PackageKit.conf ]; then
     update_conf /etc/PackageKit/PackageKit.conf "ProxyHTTP=$PROXY_ADDR"
+fi
+
+# Portage (Gentoo)
+if [ -e /etc/portage/make.conf ]; then
+    update_conf /etc/portage/make.conf "http_proxy=\"$PROXY_ADDR\"
+https_proxy=\"$PROXY_ADDR\"
+RSYNC_PROXY=\"${PROXY_ADDR_BASE}\""
+
+    # Current workaround for gpg not resolving key servers used behing proxy
+    # See QubesOS/qubes-issues#6013
+    if [ -n "$PROXY_ADDR" ]; then
+        update_conf /etc/hosts "127.0.0.1 keys.gentoo.org keys.gnupg.net"
+    else
+        update_conf /etc/hosts ""
+    fi
 fi

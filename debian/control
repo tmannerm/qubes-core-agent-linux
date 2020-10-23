@@ -6,7 +6,7 @@ Build-Depends:
     libpam0g-dev,
     libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
-    python,
+    python3,
     python3-setuptools,
     debhelper,
     quilt,
@@ -31,7 +31,7 @@ Depends:
     gawk,
     imagemagick,
     init-system-helpers,
-    initscripts,
+    initscripts | sysvinit-utils,
     librsvg2-bin,
     locales,
     ncurses-term,
@@ -40,7 +40,6 @@ Depends:
     util-linux,
     e2fsprogs,
     python3-daemon,
-    python3-distutils,
     python3-qubesdb,
     python3-gi,
     python3-xdg,
@@ -87,7 +86,7 @@ Description: Qubes core agent
 Package: qubes-core-agent-nautilus
 Architecture: any
 Depends:
-    python-nautilus,
+    ${pythonver:Depends}-nautilus,
     qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
@@ -108,8 +107,9 @@ Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:
     fakeroot,
-    yum,
-    yum-utils,
+    rpm,
+    dnf | yum,
+    dnf | yum-utils,
     qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
@@ -150,6 +150,7 @@ Depends:
     libglib2.0-bin,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
+    policykit-1
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: NetworkManager integration for Qubes VM
@@ -160,6 +161,7 @@ Description: NetworkManager integration for Qubes VM
 
 Package: qubes-core-agent-passwordless-root
 Architecture: any
+Depends: libpam-runtime
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Provides: ${diverted-files}

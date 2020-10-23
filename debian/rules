@@ -23,8 +23,7 @@ override_dh_auto_install:
 	make -C network install
 	make -C package-managers install
 	make -C package-managers install-apt
-	make -C passwordless-root install
-	make -C passwordless-root/debian install
+	make -C passwordless-root install install-debian
 	make -C qubes-rpc install
 	make -C qubes-rpc/kde install
 	make -C qubes-rpc/nautilus install
@@ -39,3 +38,11 @@ override_dh_systemd_start:
 
 override_dh_install:
 	dh_install --fail-missing
+
+override_dh_gencontrol:
+ifneq ($(shell grep -o '^9\|^10' /etc/debian_version),)
+	echo "pythonver:Depends=python" >> debian/qubes-core-agent-nautilus.substvars
+else
+	echo "pythonver:Depends=python3" >> debian/qubes-core-agent-nautilus.substvars
+endif
+	dh_gencontrol

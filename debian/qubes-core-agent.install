@@ -18,7 +18,9 @@ etc/qubes-rpc/qubes.InstallUpdatesGUI
 etc/qubes-rpc/qubes.OpenInVM
 etc/qubes-rpc/qubes.OpenURL
 etc/qubes-rpc/qubes.PostInstall
+etc/qubes-rpc/qubes.RegisterBackupLocation
 etc/qubes-rpc/qubes.ResizeDisk
+etc/qubes-rpc/qubes.RestoreById
 etc/qubes-rpc/qubes.Restore
 etc/qubes-rpc/qubes.SelectDirectory
 etc/qubes-rpc/qubes.SelectFile
@@ -35,6 +37,8 @@ etc/qubes-rpc/qubes.VMExec
 etc/qubes-rpc/qubes.VMExecGUI
 etc/qubes-rpc/qubes.WaitForSession
 etc/qubes-rpc/qubes.GetDate
+etc/qubes-rpc/qubes.TemplateSearch
+etc/qubes-rpc/qubes.TemplateDownload
 etc/qubes-suspend-module-blacklist
 etc/qubes/autostart/*
 etc/qubes/applications/*
@@ -44,6 +48,7 @@ etc/qubes/rpc-config/qubes.OpenInVM
 etc/qubes/rpc-config/qubes.OpenURL
 etc/qubes/rpc-config/qubes.SelectFile
 etc/qubes/rpc-config/qubes.SelectDirectory
+etc/qubes/rpc-config/qubes.ShowInTerminal
 etc/qubes/rpc-config/qubes.StartApp
 etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 etc/qubes/rpc-config/qubes.VMShell+WaitForSession
@@ -56,6 +61,7 @@ etc/sudoers.d/umask
 etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
 etc/systemd/system/haveged.service
+etc/systemd/system/xendriverdomain.service
 usr/lib/modules-load.d/qubes-core.conf
 usr/lib/systemd/system-preset/75-qubes-vm.preset
 usr/lib/systemd/system/boot.automount.d/30_qubes.conf
@@ -88,6 +94,7 @@ usr/lib/systemd/system/qubes-updates-proxy-forwarder@.service
 usr/lib/systemd/system/qubes-updates-proxy-forwarder.socket
 usr/lib/systemd/system/qubes-sync-time.service
 usr/lib/systemd/system/qubes-sync-time.timer
+usr/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 usr/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 usr/lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 usr/lib/systemd/system/tmp.mount.d/30_qubes.conf
@@ -145,6 +152,7 @@ usr/lib/qubes/upgrades-status-notify
 usr/lib/qubes/vm-file-editor
 usr/lib/qubes/xdg-icon
 usr/lib/qubes/tinyproxy-wrapper
+usr/lib/qubes/qvm-template-repo-query
 usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 usr/share/glib-2.0/schemas/*

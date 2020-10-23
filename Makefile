@@ -1,5 +1,3 @@
-RPMS_DIR=rpm/
-
 VERSION := $(shell cat version)
 
 LIBDIR ?= /usr/lib
@@ -10,30 +8,6 @@ PYTHON ?= /usr/bin/python3
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
 
-help:
-	@echo "make rpms                  -- generate binary rpm packages"
-	@echo "make rpms-vm               -- generate binary rpm packages for VM"
-	@echo "make clean                 -- cleanup"
-	@echo "make install-vm            -- install VM related files"
-	@echo ""
-	@echo "You must have lsb_release, rpm-sign and pandoc installed."
-
-rpms: rpms-vm
-
-rpms-vm:
-	[ "$$BACKEND_VMM" != "" ] || { echo "error: you must define variable BACKEND_VMM" >&2 ; exit 1 ; }
-	lsb_release >/dev/null 2>&1 || { echo "error: you need lsb_release (package lsb) installed" >&2 ; exit 1 ; }
-	type pandoc >/dev/null 2>&1 || { echo "error: you need pandoc installed" >&2 ; exit 1 ; }
-	type rpmsign >/dev/null 2>&1 || { echo "error: you need rpm-sign installed" >&2 ; exit 1 ; }
-	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm.spec
-	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm-doc.spec
-	[ "$$SKIP_SIGNING" != "" ] || rpm --addsign \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*.rpm \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-doc-*$(VERSION)*.rpm
-
-rpms-dom0:
-	@true
-
 clean:
 	make -C misc clean
 	make -C qubes-rpc clean
@@ -42,6 +16,8 @@ clean:
 	rm -rf test-packages/__pycache__
 	rm -rf test-packages/qubesagent.egg-info
 	rm -rf __pycache__
+	rm -rf debian/changelog.*
+	rm -rf pkgs
 	rm -f .coverage
 
 all:
@@ -54,7 +30,7 @@ USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
 SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
-SYSTEM_DROPINS += getty@tty.service
+SYSTEM_DROPINS += getty@tty.service serial-getty@.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
 SYSTEM_DROPINS += systemd-random-seed.service
@@ -130,11 +106,12 @@ SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-i
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
 install-systemd: install-init
-	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
+	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d $(DESTDIR)/etc/systemd/system
 	install -m 0644 $(SYSTEMD_CORE_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
+	install -m 0644 vm-systemd/xendriverdomain.service $(DESTDIR)/etc/systemd/system/
 
 install-sysvinit: install-init
 	install -d $(DESTDIR)/etc/init.d

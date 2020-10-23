@@ -1,0 +1,13 @@
+#%PAM-1.0
+auth     sufficient     pam_rootok.so
+auth     include        common-auth
+account  sufficient     pam_rootok.so
+# {{ Qubes specific modifications begin here
+#    Prevent su from asking for password
+#    (by package qubes-core-agent-passwordless-root).
+auth     sufficient     pam_succeed_if.so use_uid user ingroup qubes
+# }} Qubes specific modifications end here
+account  include        common-account
+password include        common-password
+session  include        common-session
+session  optional       pam_xauth.so
