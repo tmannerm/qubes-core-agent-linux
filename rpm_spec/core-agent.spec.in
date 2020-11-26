@@ -119,7 +119,7 @@ Summary:        The Qubes core files for VM
 Group:          Qubes
 Vendor:         Invisible Things Lab
 License:        GPL
-URL:            http://www.qubes-os.org
+URL:            https://www.qubes-os.org
 
 Conflicts:      firewalld
 Requires:       xdg-utils
@@ -163,6 +163,8 @@ Requires:       python%{python3_pkgversion}-daemon
 
 # for qvm-feature-request
 Requires:       python%{python3_pkgversion}-qubesdb
+# for qubes.ShowInTerminal RPC service
+Requires:       socat
 Requires:       ImageMagick
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
 Requires:       /usr/bin/rsvg-convert
@@ -955,6 +957,7 @@ The Qubes core startup configuration for systemd init.
 %files systemd
 %defattr(-,root,root,-)
 /etc/systemd/system/xendriverdomain.service
+%{_unitdir}/dev-xvdc1-swap.service
 %{_unitdir}/qubes-misc-post.service
 %{_unitdir}/qubes-mount-dirs.service
 %{_unitdir}/qubes-rootfs-resize.service
