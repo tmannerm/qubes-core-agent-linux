@@ -9,7 +9,7 @@ arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-makedepends=(gcc make pkg-config qubes-vm-utils qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python lsb-release pandoc)
+makedepends=(gcc make pkg-config qubes-vm-utils qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python python-setuptools lsb-release pandoc)
 checkdepends=()
 provides=()
 conflicts=()
@@ -61,7 +61,7 @@ package_qubes-vm-core() {
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
              zenity qubes-libvchan qubes-db-vm haveged python-gobject
              python-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
-             socat
+             socat pacman-contrib
              )
     optdepends=(gnome-keyring gnome-settings-daemon python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install=PKGBUILD.install
@@ -117,6 +117,7 @@ package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
     depends=(qubes-vm-core qubes-vm-utils python ethtool net-tools
              qubes-db-vm networkmanager iptables tinyproxy nftables
+             conntrack-tools
              )
     install=PKGBUILD-networking.install
 

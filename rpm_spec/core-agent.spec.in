@@ -111,31 +111,30 @@ restore_units() { \
     done \
 } \
 
-Name:           qubes-core-agent
-Version:        @VERSION@
-Release:        1%{dist}
-Summary:        The Qubes core files for VM
+Name:       qubes-core-agent
+Version:    @VERSION@
+Release:    1%{dist}
+Summary:    The QubesOS core files for VMs
 
-Group:          Qubes
-Vendor:         Invisible Things Lab
-License:        GPL
-URL:            https://www.qubes-os.org
+Group:      Qubes
+Vendor:     Invisible Things Lab
+License:    GPL
+URL:        https://www.qubes-os.org
 
-Conflicts:      firewalld
-Requires:       xdg-utils
-Requires:       qubes-utils >= 3.1.3
-Requires:       qubes-utils-libs >= 4.0.16
+Conflicts:  firewalld
+Requires:   xdg-utils
+Requires:   qubes-utils >= 3.1.3
+Requires:   qubes-utils-libs >= 4.0.16
 %if 0%{?suse_version} == 1500 && 0%{?is_opensuse}
-Requires:       insserv-compat
+Requires:   insserv-compat
 %else
-Requires:       initscripts
+Requires:   initscripts
 %endif
-Requires:       gawk
-Requires:       sed
-Requires:       util-linux
-Requires:       e2fsprogs
-Requires:       hostname
-
+Requires:   gawk
+Requires:   sed
+Requires:   util-linux
+Requires:   e2fsprogs
+Requires:   hostname
 # for Qubes Manager VM updater
 Requires:       xterm
 
@@ -185,26 +184,24 @@ Requires:       python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %endif
 Requires:       python%{python3_pkgversion}-setuptools
 # for qubes.ResizeDisk
-Requires:       parted
-Obsoletes:      qubes-core-vm-kernel-placeholder <= 1.0
-Obsoletes:      qubes-upgrade-vm < 3.2
-Provides:       qubes-core-vm = %{version}-%{release}
-Obsoletes:      qubes-core-vm < 4.0.0
-Provides:       qubes-core-vm-doc = %{version}-%{release}
-Obsoletes:      qubes-core-vm-doc < 4.0.0
-Conflicts:      qubes-gui-agent < 4.1.6
-
-BuildRequires:  gcc
-BuildRequires:  pandoc
-BuildRequires:  xen-devel
-BuildRequires:  libX11-devel
-BuildRequires:  qubes-utils-devel >= 3.1.3
-BuildRequires:  qubes-libvchan-@BACKEND_VMM@-devel
-BuildRequires:  pam-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  systemd
-
-Source0:        %{name}-%{version}.tar.gz
+Requires:   parted
+Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
+Obsoletes:  qubes-upgrade-vm < 3.2
+Provides:   qubes-core-vm = %{version}-%{release}
+Obsoletes:  qubes-core-vm < 4.0.0
+Provides:   qubes-core-vm-doc = %{version}-%{release}
+Obsoletes:  qubes-core-vm-doc < 4.0.0
+Conflicts:  qubes-gui-agent < 4.1.6
+BuildRequires: gcc
+BuildRequires: pandoc
+BuildRequires: xen-devel
+BuildRequires: libX11-devel
+BuildRequires: qubes-utils-devel >= 3.1.3
+BuildRequires: qubes-libvchan-@BACKEND_VMM@-devel
+BuildRequires: pam-devel
+BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: systemd
+Source0: %{name}-%{version}.tar.gz
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -264,16 +261,17 @@ Requires:       tar
 Scripts required to handle dom0 updates.
 
 %package networking
-Summary:        Networking support for Qubes VM
-Requires:       ethtool
-Requires:       iptables
-Requires:       net-tools
-Requires:       iproute
-Requires:       nftables
-Requires:       socat
-Requires:       qubes-core-agent = %{version}
-Requires:       tinyproxy
-Conflicts:      qubes-core-vm < 4.0.0
+Summary:    Networking support for Qubes VM
+Requires:   ethtool
+Requires:   iptables
+Requires:   conntrack-tools
+Requires:   net-tools
+Requires:   iproute
+Requires:   nftables
+Requires:   socat
+Requires:   qubes-core-agent = %{version}
+Requires:   tinyproxy
+Conflicts:  qubes-core-vm < 4.0.0
 
 %description networking
 This package provides:
@@ -359,7 +357,7 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
@@ -422,13 +420,13 @@ qubesfile=/etc/pam.d/su.qubes
 origfile=${qubesfile%.qubes}
 backupfile=${origfile}.qubes-orig
 if [ -r "$origfile" -a ! -r "$backupfile" ]; then
-	mv -f "$origfile" "$backupfile"
+    mv -f "$origfile" "$backupfile"
 fi
 ln -sf "$qubesfile" "$origfile"
 
 %post
 # disable some Upstart services
-for F in plymouth-shutdown prefdm splash-manager start-ttys tty; do
+for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
     if [ -e /etc/init/$F.conf ]; then
         mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
     fi
@@ -503,7 +501,7 @@ if [ "$1" != 1 ]; then
     exit 0
 fi
 
-if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ]; then
+if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
     cp /etc/init/serial.conf /var/lib/qubes/serial.orig
 fi
 
@@ -538,10 +536,15 @@ fi
 exit 0
 
 %triggerin -- selinux-policy
-#echo "--> Disabling SELinux..."
-sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-mv /etc/selinux/config.processed /etc/selinux/config
-setenforce 0 2>/dev/null
+
+. /usr/lib/qubes/init/functions
+
+if ! is_protected_file /etc/selinux/config; then
+    echo "--> Disabling SELinux..."
+    sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+    mv /etc/selinux/config.processed /etc/selinux/config
+    setenforce 0 2>/dev/null
+fi
 exit 0
 
 %post network-manager
@@ -823,7 +826,7 @@ rm -f %{name}-%{version}
 /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
 
 %files dom0-updates
-%dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
+%dir %attr(0755,user,user) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qubes-download-dom0-updates.sh
 
 %files networking
@@ -840,8 +843,12 @@ rm -f %{name}-%{version}
 %{_unitdir}/qubes-firewall.service
 %{_unitdir}/qubes-iptables.service
 %{_unitdir}/qubes-network.service
+%{_unitdir}/qubes-network-uplink.service
+%{_unitdir}/qubes-network-uplink@.service
 %{_unitdir}/qubes-updates-proxy.service
 /usr/lib/qubes/init/network-proxy-setup.sh
+/usr/lib/qubes/init/network-proxy-stop.sh
+/usr/lib/qubes/init/network-uplink-wait.sh
 /usr/lib/qubes/init/qubes-iptables
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/qubes-setup-dnat-to-ns
@@ -957,7 +964,6 @@ The Qubes core startup configuration for systemd init.
 %files systemd
 %defattr(-,root,root,-)
 /etc/systemd/system/xendriverdomain.service
-%{_unitdir}/dev-xvdc1-swap.service
 %{_unitdir}/qubes-misc-post.service
 %{_unitdir}/qubes-mount-dirs.service
 %{_unitdir}/qubes-rootfs-resize.service
@@ -995,45 +1001,6 @@ The Qubes core startup configuration for systemd init.
 %{_userunitdir}/pulseaudio.service.d/30_qubes.conf
 %{_userunitdir}/pulseaudio.socket.d/30_qubes.conf
 
-%post systemd
-changed=
-
-%scriptletfuns
-if [ $1 -eq 1 ]; then
-    preset_units %{_presetdir}/%qubes_preset_file initial
-    changed=true
-else
-    preset_units %{_presetdir}/%qubes_preset_file upgrade
-    changed=true
-    # Upgrade path - now qubes-iptables is used instead
-    for svc in iptables ip6tables; do
-        if [ -f "$svc".service ]; then
-            systemctl --no-reload preset "$svc".service
-            changed=true
-        fi
-    done
-fi
-
-if [ $1 -eq 1 ]; then
-    # First install.
-    # Set default "runlevel".
-    # FIXME: this ought to be done via kernel command-line.
-    # The fewer deviations of the template from the seed image, the better.
-    rm -f %{_sysconfdir}/systemd/system/default.target
-    ln -s %{_unitdir}/multi-user.target %{_sysconfdir}/systemd/system/default.target
-    changed=true
-fi
-
-# remove old symlinks
-if [ -L %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
-    rm -f %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service
-    changed=true
-fi
-
-if [ -L %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service ]; then
-    rm -f %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service
-    changed=true
-fi
 
 if [ "x$changed" != "x" ]; then
     systemctl daemon-reload

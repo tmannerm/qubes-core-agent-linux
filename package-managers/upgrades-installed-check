@@ -19,7 +19,7 @@ if [ -e /etc/system-release ] || [[ $ID_LIKE == *"suse"* ]]; then
         yum=yum
     fi
     # shellcheck disable=SC2034
-    yum_output="$($yum -q check-update 2>&1)"
+    yum_output="$($yum -yq check-update)"
     exit_code="$?"
     [ "$exit_code" -eq 100 ] && echo "false" && exit 0
     [ "$exit_code" -eq 0 ] && echo "true"
@@ -36,9 +36,10 @@ elif [ -e /etc/arch-release ]; then
     ## Archlinux
     set -e
     set -o pipefail
-    checkupdates_output="$(checkupdates 2>&1)"
+    checkupdates >/dev/null 2>&1
     exit_code="$?"
-    echo "$checkupdates_output" | grep -qF -- '->' && echo "false" || echo "true"
+    [ "$exit_code" -eq 2 ] && echo "true" && exit 0
+    echo "false"
 elif [ -e /etc/gentoo-release ]; then
     ## Gentoo
     set -e
